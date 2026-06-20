@@ -393,7 +393,7 @@ class ResultFrame(BaseFrame):
             self.buttons.append(NumberButton(self.canvas, img, attention, selected, area, cmd, self.app.hover_time))
         now = datetime.now()
         now_micro = now.strftime('%Y%m%d_%H%M%S')
-        file_name = f'output/result_{now_micro}.txt'
+        file_name = f'output/number2_result_{now_micro}.txt'
         try:
             with open(file_name, 'w', encoding='utf-8') as f:
                     f.write(f"n2.py\n")
