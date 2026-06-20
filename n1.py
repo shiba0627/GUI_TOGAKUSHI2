@@ -289,11 +289,22 @@ class GameFrame(BaseFrame):# 操作画面
         for img, attention, selected, center_x_ratio, center_y_ratio, cmd in button_list:
             area = self._calc_area(self.app.button_size_ratio, center_x_ratio,center_y_ratio)
             self.buttons.append(NumberButton(self.canvas, img, attention, selected, area, cmd, self.app.hover_time))
+
+        # 経過時間表示
+        self.time_text_id = self.canvas.create_text(self.width - 50, 50, text="0.0秒", font=("Arial", 40, "bold"), anchor="ne")
         self.check_cursor()
+        
 
     def check_cursor(self):
         x = self.master.winfo_pointerx() - self.master.winfo_rootx()
         y = self.master.winfo_pointery() - self.master.winfo_rooty()
+        
+        if self.app.prev_x is not None:
+            dx = x - self.app.prev_x
+            dy = y - self.app.prev_y
+            self.app.cursor_distance += (dx**2 + dy**2)**0.5
+        self.app.prev_x = x
+        self.app.prev_y = y
 
 
         #各ボタンにマウス位置を通知
@@ -361,7 +372,11 @@ class GameFrame(BaseFrame):# 操作画面
             self.buttons[5].set_active()
             self.buttons[6].set_active()
             self.buttons[7].set_active()
+        self.update_elapsed_time()
         self.master.after(20, self.check_cursor)
+    def update_elapsed_time(self):
+        elapsed = time.time() - self.app.start_time
+        self.canvas.itemconfig(self.time_text_id, text=f"{elapsed:.1f}秒")
 class ReadyFrame(BaseFrame):# 準備画面
     def __init__(self, master = None, app_instance = None):
         super().__init__(master,  app_instance)
@@ -394,7 +409,8 @@ class ResultFrame(BaseFrame):
                     f.write(f"n1.py\n")
                     f.write(f"数字消し\n")
                     f.write(f"クリアタイム：{t}秒\n")
-                    f.write(f'滞留時間{self.app.hover_time}秒')
+                    f.write(f'滞留時間{self.app.hover_time}秒\n')
+                    f.write(f"移動距離：{self.app.cursor_distance:.0f}px\n")
         except IOError as e:
             print(e)
         self.check_cursor()
@@ -467,7 +483,10 @@ class mainApp:
         self.start_time = time.time()
         self.end_time = None
         self.hover_time = HOVER_TIME#滞留時間
-        self.button_size_ratio = BUTTON_SIZE_RATIO
+        self.button_size_ratio = BUTTON_SIZE_RATIO#ボタンの大きさ
+        self.cursor_distance = 0.0#カーソルの総移動距離
+        self.prev_x = None#カーソル移動距離計算用
+        self.prev_y = None#カーソル移動距離計算用
         self.show_frame(FrameName.READY)
 
     def show_frame(self, frame_name):
@@ -477,6 +496,9 @@ class mainApp:
             self.current_frame = ReadyFrame(self.root, self)
         elif frame_name == FrameName.GAME:
             self.start_time = time.time()
+            self.cursor_distance = 0.0
+            self.prev_x = None
+            self.prev_y = None
             self.current_frame = GameFrame(self.root, self)
         elif frame_name == FrameName.RESULT:
             self.current_frame = ResultFrame(self.root, self)
