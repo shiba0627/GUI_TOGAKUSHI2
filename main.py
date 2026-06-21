@@ -334,8 +334,8 @@ class GUIApp:
             self.last_activated_button = activated_button_this_frame
 
         # 常に self.last_sent_data に基づいてコマンドを送信
-        threading.Thread(target=self.send_command, args=(self.last_sent_data,), daemon=True).start()
-        #self.send_command(self.last_sent_data)
+        #threading.Thread(target=self.send_command, args=(self.last_sent_data,), daemon=True).start()
+        self.send_command(self.last_sent_data)
         # 画像表示を更新
         self.update_image_display()
 
