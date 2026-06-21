@@ -293,15 +293,17 @@ class ResultFrame(BaseFrame):
         self.canvas.create_text(cx, cy - 10, text=f"ありがとうございました！", font=("Arial", 90))
         now = datetime.now()
         now_micro = now.strftime('%Y%m%d_%H%M%S')
-        file_name = f'output/result_{now_micro}.txt'
+        file_name = f'output/question_result_{now_micro}.txt'
         try:
             with open(file_name, 'w', encoding='utf-8') as f:
                     f.write(f"{t}秒\n")
                     f.write(f'滞留時間{self.app.hover_time}秒')
                     # 回答内容
                     f.write("【回答結果】\n")
-                    for i, ans in enumerate(self.app.answers, start=1):
-                        f.write(f"Q{i}: {ans}\n")
+                    for question, answer in zip(self.app.questions, self.app.answers):
+                        f.write(f"質問: {question}\n")
+                        f.write(f"回答: {answer}\n")
+                        f.write("\n")
         except IOError as e:
             print(e)
         self.check_cursor()
@@ -509,12 +511,21 @@ class AnswerFrame(BaseFrame):
 class mainApp:
     def __init__(self):
         # 質問リスト
+        """
         self.questions = [
             "とりくみがある日の朝の気分はどうでしたか？",
             "とりくみがおわった後の気分はどうでしたか？",
             "とりくみはつかれますか？",
             "おもったとおりに操縦できましたか？",
             "来年度もこのとりくみをしたいですか？",
+        ]
+        """
+        self.questions = [
+            "今、つかれていますか？",
+            "今日はたのしくできましたか？",
+            "おもったとおりに操縦できましたか？",
+            "コースはむずかしかったですか？",
+            "またやりたいですか？",
         ]
         #現在の質問番号
         self.question_index = 0
