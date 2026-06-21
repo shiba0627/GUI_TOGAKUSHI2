@@ -422,6 +422,7 @@ class ResultFrame(BaseFrame):
         try:
             with open(file_name, 'w', encoding='utf-8') as f:
                     f.write(f"n2.py\n")
+                    f.write(f"ryuki\n")
                     f.write(f"数字消し\n")
                     f.write(f"クリアタイム：{t}秒\n")
                     f.write(f'滞留時間{self.app.hover_time}秒\n')
